@@ -1,13 +1,18 @@
-const aiService = require("../services/ai.service")
-
+const aiService = require("../services/ai.service");
 
 module.exports.getReview = async (req, res) => {
-    const code = req.query.prompt || req.body.code; // Accept query param or body
+    // For GET requests, use query parameter; for POST requests, use request body.
+    const code = req.body.code;
 
     if (!code) {
-        return res.status(400).send("Prompt is required");
+        return res.status(400).send("Code is required");
     }
 
-    const response = await aiService(code);
-    res.send(response);
+    try {
+        const response = await aiService(code);
+        res.send(response);
+    } catch (error) {
+        console.error("Error generating review:", error);
+        res.status(500).send("Internal Server Error");
+    }
 };
