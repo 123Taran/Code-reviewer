@@ -1,53 +1,55 @@
 const aiService = require("../services/ai.service");
-const vm = require("vm");
 
 module.exports.getReview = async (req, res) => {
-    const code = req.body.code;
+    const { code, language, errorMessage } = req.body;
 
     if (!code) {
         return res.status(400).send("Code is required");
     }
 
-    try {
-        // Try to execute code in a sandboxed environment
-        const sandbox = {};
-        vm.createContext(sandbox); // create a context to run the code in isolation
-        vm.runInContext(code, sandbox, { timeout: 1000 }); // 1 second max
+    // Basic check for natural language input
+    const isLikelyCode = /function|let|const|var|=>|;|{|}|\(|\)|def|class|int|print/.test(code);
 
-        // If no error, code ran fine, no review needed
+    if (!isLikelyCode) {
+        return res.send({
+            message: "👋 I’m your code reviewer. Please provide valid code for me to review.",
+            review: null
+        });
+    }
+
+    // If there's no error, assume code ran successfully
+    if (!errorMessage) {
         return res.send({
             message: "✅ Code ran successfully. No errors found.",
             review: null
         });
+    }
 
-    } catch (err) {
-        // If code fails to run, generate review from AI
-        try {
-            const errorPrompt = `
-The following code throws an error when executed. Please identify the reason for the error and suggest the correct version of the code. Only focus on fixing the error, do not comment on code quality or best practices.
+    // Use AI to review the code and error
+    try {
+        const prompt = `
+The following ${language} code throws an error when executed. Identify the issue and suggest the corrected version. Only focus on fixing the error.
 
 ❌ Code:
-\`\`\`javascript
+\`\`\`${language.toLowerCase()}
 ${code}
 \`\`\`
 
 💥 Error Message:
-${err.message}
+${errorMessage}
 
 ✅ Fix:
 `;
 
-            const response = await aiService(errorPrompt);
+        const response = await aiService(prompt);
 
-            res.send({
-                message: "⚠️ Code has errors.",
-                error: err.message,
-                review: response
-            });
-
-        } catch (error) {
-            console.error("Error generating review:", error);
-            res.status(500).send("Internal Server Error");
-        }
+        res.send({
+            message: "⚠️ Code has errors.",
+            error: errorMessage,
+            review: response
+        });
+    } catch (error) {
+        console.error("AI Review Error:", error);
+        res.status(500).send("Internal Server Error");
     }
 };
