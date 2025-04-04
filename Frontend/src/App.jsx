@@ -20,30 +20,42 @@ function App() {
 
   // Combined function to handle both review and execution
   async function handleCodeReviewAndExecution() {
-    setLoading(true); // Show loading state
+    setLoading(true);
+    setReview('');
+    setOutput('');
   
-    // Review Code
     try {
-      const reviewResponse = await axios.post('http://localhost:3000/ai/get-review', { code });
-      setReview(reviewResponse.data);  // Set the review
-  
-      // Compile Code
+      // Compile Code First
       const compileResponse = await axios.post('http://localhost:3000/ai/compiler/execute', {
-        language_id: 63,  // JavaScript language ID
-        source_code: code, // Pass the code as source_code
-        stdin: ""  // No input required for now
+        language_id: 63,
+        source_code: code,
+        stdin: ""
       });
   
-      if (compileResponse.data.stderr) {
-        setOutput(`Error: ${compileResponse.data.stderr}`); // Show error if stderr is present
+      const { stdout, stderr, status } = compileResponse.data;
+  
+      if (stderr) {
+        setOutput(`❌ Error:\n${stderr}`);
+        
+        // Only if error in execution, then call AI review
+        const reviewResponse = await axios.post('http://localhost:3000/ai/get-review', { code });
+
+const reviewText = typeof reviewResponse.data === 'string'
+  ? reviewResponse.data
+  : reviewResponse.data.review || JSON.stringify(reviewResponse.data, null, 2);
+
+setReview(reviewText);
+
+      } else if (status?.description === "Accepted") {
+        setOutput(stdout || "✅ Code executed, but no output.");
       } else {
-        setOutput(compileResponse.data.stdout); // Show normal output
+        setOutput("⚠️ Unknown status from compiler.");
       }
     } catch (error) {
-      console.error('Error:', error);
-      setOutput('Error Executing Code');
+      console.error('🚨 Error:', error);
+      setOutput('❌ Something went wrong. Check console.');
     } finally {
-      setLoading(false); // Hide loading state after both actions are complete
+      setLoading(false);
     }
   }
   
