@@ -1,6 +1,7 @@
+/* Reset and Base Styles */
 * {
-  margin: 0%;
-  padding: 0%;
+  margin: 0;
+  padding: 0;
   box-sizing: border-box;
 }
 
@@ -9,6 +10,9 @@ body,
 #root {
   height: 100%;
   width: 100%;
+  font-family: 'Fira Code', monospace;
+  background-color: #f5f7fa;
+  color: #333;
 }
 
 main {
@@ -16,135 +20,133 @@ main {
   width: 100%;
   padding: 1.5rem;
   display: flex;
-  gap: 1rem;
+  gap: 1.5rem;
 }
 
 main .left,
 main .right {
   height: 100%;
   flex-basis: 50%;
-}
-
-main .left {
-  position: relative;
-  border: 15px solid rgb(115, 211, 227);
-}
-
-.left .code,
-.code pre,
-.code pre code {
-  height: 60%;
-  width: 100%;
-  margin: 0;
-  background-color: white;
-  overflow-y: auto; /* ✅ Add vertical scroll */
-  overflow-x: hidden; /* Optional: prevent horizontal scroll */
-}
-
-
-.Terminal {
-  height: 40%;
-  background-color: #1e1e1e;
-  color: white;
-  padding: 1rem;
   display: flex;
-  justify-content: flex-start;  /* 👈 Optional: align top instead of center */
-  align-items: flex-start;      /* 👈 Optional: align top */
-  font-family: "Courier New", monospace;
-  overflow-y: auto; /* ✅ Add vertical scroll */
+  flex-direction: column;
+  background-color: #fff;
+  border-radius: 1rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.07);
+  overflow: hidden;
 }
 
-
-.Terminal pre {
-  margin: 0;
-  word-wrap: break-word;
-  white-space: pre-wrap;
-}
-
-main .left .review,
-main .left .execute {
-  position: relative;
-  bottom: 1rem;
-  right: 1rem;
-  background-color: rgb(219, 219, 255);
-  color: #000000;
-  padding: 0.5rem 2rem;
-  font-weight: 500;
-  cursor: pointer;
-  user-select: none;
-}
-
-main .left .execute {
-  background-color: #4CAF50;
-  color: white;
-}
-
-main .left .execute:hover {
-  background-color: #45a049;
-}
-
-main .left .review {
-  position: absolute;
-  right: 0;
-  border-radius: 0.7rem;
-  height: 50px;
-  width: 100px;
-  background-color: rgb(19, 148, 51);
-  justify-content: center;
-}
-
-main .right {
-  background-color: white;
-  padding: 1rem 2rem;
-  font-size: 1.5rem;
-  overflow: auto;
-  height: 100%;  /* Ensure this section takes necessary space */
-  max-height: 100%; /* Limit height if necessary */
-  border: 2px solid black;
-}
-
-main .right pre {
-  white-space: pre-wrap; /* Ensure long lines wrap */
-  word-wrap: break-word;
+/* Left Section Enhancements */
+main .left {
   padding: 1rem;
-  background-color: #f4f4f4; /* Light background for readability */
-  border-radius: 0.7rem;
-}
-
-pre {
-  font-family: "Courier New", monospace;
-  font-size: 1.1rem;
-  color: #e1e1e1;
-}
-
-code {
-  font-size: 1rem;
-}
-
-/* Editor style for better visibility */
-.editor {
-  min-height: 100%;     /* ✅ takes full height of parent */
-  width: 100%;
-  border: 1px solid #ddd;
-  background-color: white;
-  font-family: "Fira Code", monospace;
-  font-size: 16px;
-  overflow-y: auto;     /* 🔁 scrolls if content overflows */
-  padding: 10px;
-  box-sizing: border-box;
-  white-space: pre-wrap; /* Optional: wraps lines */
-  word-wrap: break-word;
-}
-.editor .CodeMirror {
-  font-family: "Fira Code", monospace;
-  font-size: 16px;
+  border: none;
 }
 
 .language-select {
-  margin: 0.5rem 1rem;
-  font-size: 1rem;
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
 }
 
 .language-select label {
-  margin-right: 0.5rem;
+  font-weight: bold;
+  font-size: 1rem;
+}
+
+.language-select select {
+  padding: 0.5rem;
+  font-size: 1rem;
+  border-radius: 0.5rem;
+  border: 1px solid #ccc;
+  background-color: #f9f9f9;
+  transition: border 0.3s;
+}
+
+.language-select select:focus {
+  border-color: #4caf50;
+  outline: none;
+}
+
+/* Code Editor Styling */
+.left .code {
+  height: 60%;
+  background-color: #fdfdfd;
+  border: 1px solid #e1e1e1;
+  border-radius: 0.7rem;
+  overflow: hidden;
+}
+
+.editor {
+  height: 100%;
+  width: 100%;
+  font-size: 15px;
+  padding: 1rem;
+  line-height: 1.5;
+  background-color: white;
+  overflow-y: auto;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+
+/* Terminal Styling */
+.Terminal {
+  height: 40%;
+  background-color: #1e1e1e;
+  color: #d4d4d4;
+  padding: 1rem;
+  font-family: "Courier New", monospace;
+  border-radius: 0.7rem;
+  margin-top: 1rem;
+  overflow-y: auto;
+  font-size: 0.95rem;
+}
+
+.Terminal pre {
+  margin: 0;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+
+/* Execute Button */
+.review {
+  margin-top: 1rem;
+  align-self: flex-end;
+  background-color: #4caf50;
+  color: white;
+  padding: 0.6rem 1.5rem;
+  font-weight: 600;
+  font-size: 1rem;
+  border: none;
+  border-radius: 0.6rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.review:hover {
+  background-color: #45a049;
+}
+
+/* Right Panel for AI Review */
+main .right {
+  padding: 1.5rem;
+  overflow-y: auto;
+  font-size: 1rem;
+  border: 1px solid #e0e0e0;
+}
+
+main .right pre {
+  background-color: #f0f0f0;
+  padding: 1rem;
+  border-radius: 0.7rem;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+
+/* Code snippets in Markdown */
+code {
+  font-size: 0.95rem;
+  background-color: #eee;
+  padding: 0.2rem 0.4rem;
+  border-radius: 0.4rem;
 }
