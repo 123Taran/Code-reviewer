@@ -50,32 +50,51 @@ function App() {
         stdin: ""
       });
 
-      const { stdout, stderr, status } = compileResponse.data;
+      const { stdout, stderr, compile_output, message, status } = compileResponse.data;
 
-      if (stderr) {
-        setOutput(`❌ Error:\n${stderr}`);
+      const errorMsg = stderr || compile_output || message;
+
+      if (errorMsg) {
+        setOutput(`❌ Error:\n${errorMsg}`);
 
         const reviewResponse = await axios.post('http://localhost:3000/ai/get-review', {
           code,
           language: languages[language].name,
-          errorMessage: stderr
+          errorMessage: errorMsg
         });
-        
 
         const reviewText = typeof reviewResponse.data === 'string'
           ? reviewResponse.data
           : reviewResponse.data.review || JSON.stringify(reviewResponse.data, null, 2);
 
         setReview(reviewText);
-
       } else if (status?.description === "Accepted") {
         setOutput(stdout || "✅ Code executed, but no output.");
       } else {
-        setOutput("⚠️ Unknown status from compiler.");
+        setOutput(`⚠️ Unknown status from compiler. Status: ${status?.description}`);
       }
     } catch (error) {
-      console.error('🚨 Error:', error);
-      setOutput('❌ Something went wrong. Check console.');
+      console.error('🚨 Error:', error.response?.data || error.message || error);
+
+      const errorMsg = error.response?.data?.message || error.message || "Unknown error";
+      setOutput(`❌ Error:\n${errorMsg}`);
+
+      try {
+        const reviewResponse = await axios.post('http://localhost:3000/ai/get-review', {
+          code,
+          language: languages[language].name,
+          errorMessage: errorMsg
+        });
+
+        const reviewText = typeof reviewResponse.data === 'string'
+          ? reviewResponse.data
+          : reviewResponse.data.review || JSON.stringify(reviewResponse.data, null, 2);
+
+        setReview(reviewText);
+      } catch (reviewErr) {
+        console.error("🚨 Review generation failed:", reviewErr);
+        setReview("⚠️ Could not generate review for this error.");
+      }
     } finally {
       setLoading(false);
     }
