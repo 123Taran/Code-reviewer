@@ -13,19 +13,24 @@ body,
   font-family: 'Fira Code', monospace;
   background-color: #f5f7fa;
   color: #333;
+  /* Remove overflow hidden to allow vertical scrolling on small */
+  overflow-x: hidden;
+  overflow-y: auto;
 }
 
 main {
-  height: 100%;
+  min-height: 100vh;
   width: 100%;
-  padding: 1.5rem;
+  padding: 1rem;
   display: flex;
   gap: 1.5rem;
+  /* allow wrapping */
+  flex-wrap: nowrap;
 }
 
+/* Desktop two-column */
 main .left,
 main .right {
-  height: 100%;
   flex-basis: 50%;
   display: flex;
   flex-direction: column;
@@ -33,19 +38,24 @@ main .right {
   border-radius: 1rem;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.07);
   overflow: hidden;
+  height: auto;
+  max-height: 100vh; /* Limit max height */
 }
 
-/* Left Section Enhancements */
+/* Left Panel */
 main .left {
   padding: 1rem;
-  border: none;
+  gap: 1rem;
+  overflow: hidden; /* for internal scroll */
 }
 
+/* Language Select */
 .language-select {
-  margin-bottom: 1rem;
+  margin-bottom: 0;
   display: flex;
   align-items: center;
   gap: 0.5rem;
+  flex-shrink: 0;
 }
 
 .language-select label {
@@ -68,37 +78,81 @@ main .left {
 }
 
 /* Code Editor Styling */
-.left .code {
-  height: 60%;
-  background-color: #fdfdfd;
-  border: 1px solid #e1e1e1;
+.code {
+  height: 300px;
+  width: 100%;
+  overflow-y: auto;
+  background-color: #1e1e1e;
   border-radius: 0.7rem;
-  overflow: hidden;
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+  flex-shrink: 0;
 }
 
+/* react-simple-code-editor's editable div */
 .editor {
-  height: 100%;
-  width: 100%;
-  font-size: 15px;
-  padding: 1rem;
+  flex: 1;
+  font-family: 'Fira Code', monospace;
+  font-size: 14px;
   line-height: 1.5;
-  background-color: white;
-  overflow-y: auto;
+  padding: 12px;
+  background: transparent;
+  color: white;
+  overflow-wrap: break-word;
   white-space: pre-wrap;
   word-wrap: break-word;
+  outline: none;
+  min-height: 100%;
+}
+
+/* Prevent textarea or inner content clipping */
+.editor textarea {
+  height: auto !important;
+  min-height: 100% !important;
+  overflow: visible !important;
+  resize: none;
+  background: transparent;
+  color: inherit;
+  font-family: inherit;
+  font-size: inherit;
+  line-height: inherit;
+  border: none;
+  outline: none;
+  box-sizing: border-box;
+}
+
+/* Custom scrollbar for editor */
+.editor::-webkit-scrollbar {
+  width: 8px;
+}
+
+.editor::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+.editor::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 4px;
+}
+
+.editor::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
 }
 
 /* Terminal Styling */
 .Terminal {
-  height: 40%;
+  flex: 0 0 35%;
+  min-height: 200px;
   background-color: #1e1e1e;
   color: #d4d4d4;
   padding: 1rem;
-  font-family: "Courier New", monospace;
   border-radius: 0.7rem;
-  margin-top: 1rem;
   overflow-y: auto;
+  font-family: "Courier New", monospace;
   font-size: 0.95rem;
+  margin-top: 1rem;
 }
 
 .Terminal pre {
@@ -129,10 +183,15 @@ main .left {
 
 /* Right Panel for AI Review */
 main .right {
+  flex-grow: 1;
   padding: 1.5rem;
   overflow-y: auto;
   font-size: 1rem;
   border: 1px solid #e0e0e0;
+  height: auto;
+  max-height: 100vh; /* limit max height to viewport */
+  display: flex;
+  flex-direction: column;
 }
 
 main .right pre {
@@ -141,6 +200,8 @@ main .right pre {
   border-radius: 0.7rem;
   white-space: pre-wrap;
   word-wrap: break-word;
+  flex-grow: 1;
+  overflow-y: auto;
 }
 
 /* Code snippets in Markdown */
@@ -150,3 +211,122 @@ code {
   padding: 0.2rem 0.4rem;
   border-radius: 0.4rem;
 }
+
+/* Responsive */
+
+/* Tablets and smaller */
+@media (max-width: 1024px) {
+  main {
+    flex-direction: column;
+    padding: 1rem;
+    height: auto;
+  }
+
+  main .left,
+  main .right {
+    flex-basis: 100%;
+    width: 100%;
+    height: auto;
+    max-height: none;
+  }
+
+  .code {
+    height: 250px;
+  }
+
+  .Terminal {
+    min-height: 150px;
+    font-size: 0.9rem;
+    padding: 0.8rem;
+    margin-top: 0.8rem;
+  }
+
+  .review {
+    align-self: stretch;
+    width: 100%;
+    text-align: center;
+    padding: 0.8rem 1rem;
+    font-size: 1rem;
+  }
+}
+
+/* Mobile phones */
+@media (max-width: 480px) {
+  html,
+  body {
+    font-size: 14px;
+  }
+
+  main {
+    padding: 0.5rem;
+  }
+
+  main .left,
+  main .right {
+    height: auto;
+    max-height: none;
+  }
+
+  .code {
+    height: 180px;
+  }
+
+  .Terminal {
+    min-height: 120px;
+    font-size: 0.85rem;
+    padding: 0.6rem;
+    margin-top: 0.6rem;
+  }
+
+  .review {
+    font-size: 0.9rem;
+    padding: 0.5rem 1rem;
+  }
+
+  .language-select {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.3rem;
+  }
+
+  .language-select select {
+    width: 100%;
+  }
+}
+
+/* Header and profile */
+.header {
+  display: flex;
+  justify-content: flex-end;
+  padding: 8px;
+  background-color: #333;
+  color: white;
+  margin-bottom: 0;
+}
+
+.profile {
+  border-radius: 10px solid;
+  border: 2px solid red;
+}
+
+/* Sidebar toggle button aligned with header */
+.sidebar-toggle {
+  /* align vertically with header padding */
+  margin-left: 1rem;       /* same left margin as header content padding */
+  margin-top: 8px;         /* same vertical padding as header */
+  
+  background-color: #4caf50;
+  color: white;
+  border: none;
+  font-weight: 600;
+  font-size: 1rem;
+
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+
+  
+}
+
+
+
